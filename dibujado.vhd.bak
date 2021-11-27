@@ -1,0 +1,40 @@
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL; 
+
+ENTITY dibujado IS 
+PORT (
+	posicion_horizontal : IN INTEGER RANGE 0 TO 2256;
+	posicion_vertical   : IN INTEGER RANGE 0 TO 1087;
+	paleta_horizontal1  : IN INTEGER RANGE 586 TO 2246;
+	paleta_vertical1    : IN INTEGER RANGE 47 TO 1077;
+	SEG7 : OUT STD_LOGIC_VECTOR(6 DOWNTO 0)  
+);
+END ENTITY;
+ 
+ARCHITECTURE behaviour OF dibujado IS
+BEGIN
+dibujado_paleta : PROCESS (clk_vga) 
+BEGIN
+	IF (RISING_EDGE(clk_vga)) THEN
+		IF ( (posicion_horizontal >= paleta_horizontal1 AND posicion_horizontal < paleta_horizontal1 + 15) AND (posicion_vertical >= paleta_vertical1 AND posicion_vertical < paleta_vertical1 + 80) ) THEN
+			iniciar_rojo <= X"F";
+		ELSIF ( (posicion_horizontal >= paleta_horizontal2 AND posicion_horizontal < paleta_horizontal2 + 15) AND (posicion_vertical >= paleta_vertical2 AND posicion_vertical < paleta_vertical2 + 80) ) THEN
+			iniciar_rojo <= X"F";
+		ELSE
+			iniciar_rojo <= X"0";
+		END IF;	
+	END IF;	 
+END PROCESS;
+
+dibujado_bola : PROCESS (clk_vga) 
+BEGIN 
+	IF (RISING_EDGE(clk_vga)) THEN
+		IF ((posicion_horizontal >= posicion_bola_h1 AND posicion_horizontal < posicion_bola_h1 + 15) AND (posicion_vertical >= posicion_bola_v1 AND posicion_vertical < posicion_bola_v1 + 15) ) THEN
+			iniciar_azul <= X"F";
+		ELSE
+			iniciar_azul <= X"0";
+		END IF;
+	END IF; 
+END PROCESS;
+END ARCHITECTURE;

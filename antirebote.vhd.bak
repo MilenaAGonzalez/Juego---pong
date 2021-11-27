@@ -1,0 +1,84 @@
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY antirebote IS
+    PORT (
+	     clk     : IN  STD_LOGIC;                
+        rst     : IN  STD_LOGIC;
+	     sw      : IN  STD_LOGIC;
+		  syn_clr : OUT STD_LOGIC;
+		  TimerMaxTick : IN  STD_LOGIC;
+		  ena     : OUT STD_LOGIC;
+		  deb_sw  : OUT STD_LOGIC
+    );
+END ENTITY;
+
+ARCHITECTURE behavior OF antirebote IS
+ TYPE Estado IS (S0,S1,S2,S3);       
+ SIGNAL Estado_Actual,Siguiente_Estado : Estado;
+BEGIN
+fsm: PROCESS (Estado_Actual,sw,TimerMaxTick)
+   BEGIN 
+     CASE Estado_Actual IS
+	  
+	    WHEN S0 =>
+		   ena <= '0';
+			syn_clr <= '1';
+			deb_sw <= '1';
+		   IF(sw = '0') THEN
+			  Siguiente_Estado <= S1;
+			ELSE
+			  Siguiente_Estado <= S0;
+			END IF;
+
+	    WHEN S1 =>
+		   ena <= '1';
+			syn_clr <= '0';
+			deb_sw <= '1';
+		   IF(TimerMaxTick = '1') THEN
+			  IF(sw = '0') THEN
+			    syn_clr <= '1';
+			    Siguiente_Estado <= S2;
+			  ELSE
+			    Siguiente_Estado <= S0;
+			  END IF;
+			ELSE
+			  Siguiente_Estado <= S1;
+			END IF; 
+		
+	     WHEN S2 =>
+		   ena <= '1';
+			syn_clr <= '0';
+			deb_sw <= '1';
+		   IF(TimerMaxTick = '1') THEN
+			  IF(sw = '0') THEN
+			    Siguiente_Estado <= S3;		
+           ELSE
+             Siguiente_Estado <= S0;				  
+			  END IF;
+			ELSE
+			  Siguiente_Estado <= S2;
+			END IF;
+		
+	     WHEN S3 =>
+		   ena <= '0';
+			syn_clr <= '0';
+			deb_sw <= '0';
+		   IF(sw = '0') THEN
+			   Siguiente_Estado <= S3;		
+         ELSE
+            Siguiente_Estado <= S0;				  
+			END IF;	
+	  END CASE;
+   END PROCESS fsm;
+
+ Asignador_Estado: PROCESS (clk, rst)
+  BEGIN  
+    IF rst = '1' THEN                   
+      Estado_Actual <= S0;
+    ELSIF RISING_EDGE(clk) THEN 
+      Estado_Actual <= Siguiente_Estado;
+    END IF;
+  END PROCESS Asignador_Estado;
+END ARCHITECTURE;

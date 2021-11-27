@@ -1,0 +1,47 @@
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL; 
+
+ENTITY Display IS PORT (
+	input   : IN INTEGER RANGE 0 TO 9;
+	seg_out : OUT STD_LOGIC_VECTOR(6 DOWNTO 0)
+  
+);
+ 
+END ENTITY;
+ 
+ARCHITECTURE behaviour OF Display IS
+
+BEGIN
+
+display_output : PROCESS(input)
+BEGIN
+	--LEDs are inverted so 1 = off 0 = on
+	CASE input IS
+	 WHEN 0 =>
+		seg_out <= B"1000000";
+	 WHEN 1 =>
+		seg_out <= B"1111001";
+	 WHEN 2 =>
+		seg_out <= B"0100100";
+	 WHEN 3 =>
+		seg_out <= B"0110000";
+	 WHEN 4 =>
+		seg_out <= B"0011001";
+	 WHEN 5 =>
+		seg_out <= B"0010010";
+	 WHEN 6 =>
+		seg_out <= B"0000010";
+	 WHEN 7 =>
+		seg_out <= B"1111000";
+	 WHEN 8 =>
+		seg_out <= B"0000000";
+	 WHEN 9 =>
+		seg_out <= B"0010000";
+	 WHEN OTHERS =>
+		seg_out <= B"0000000"; 
+	END CASE; 
+	
+END process;
+
+END ARCHITECTURE;

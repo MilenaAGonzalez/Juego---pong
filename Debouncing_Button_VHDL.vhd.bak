@@ -1,0 +1,43 @@
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+
+ENTITY Debouncing_Button_VHDL IS
+PORT(
+ button: IN STD_LOGIC;
+ clk: IN STD_LOGIC;
+ debounced_button: OUT STD_LOGIC
+);
+END ENTITY;
+
+architecture Behavioral of Debouncing_Button_VHDL is
+signal slow_clk_enable: std_logic;
+signal Q1,Q2,Q2_bar,Q0: std_logic;
+begin
+
+clock_enable_generator: entity work.clock_enable_debouncing_button PORT MAP 
+      ( clk => clk,
+        slow_clk_enable => slow_clk_enable
+      );
+Debouncing_FF0: entity work.DFF_Debouncing_Button PORT MAP 
+      ( clk => clk,
+        clock_enable => slow_clk_enable,
+        D => button,
+        Q => Q0
+      ); 
+
+Debouncing_FF1: entity work.DFF_Debouncing_Button PORT MAP 
+      ( clk => clk,
+        clock_enable => slow_clk_enable,
+        D => Q0,
+        Q => Q1
+      );      
+Debouncing_FF2: entity work.DFF_Debouncing_Button PORT MAP 
+      ( clk => clk,
+        clock_enable => slow_clk_enable,
+        D => Q1,
+        Q => Q2
+      ); 
+ Q2_bar <= not Q2;
+ debounced_button <= Q1 and Q2_bar;
+end Behavioral;
